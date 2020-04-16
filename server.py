@@ -2,6 +2,7 @@ import threading
 import queue
 import socket
 import sys
+import time
 
 def comm():
     global events
@@ -28,8 +29,15 @@ def process():
             elif temp[0] == 'r':
                 clocks.append((temp[0] + "," + temp[1], max(clocks[-1][1], int(temp[-2])) + 1))
             else:
-                print(clocks[1:])
-            
+                print(sys.argv[1] + " Print Clock:")
+                for i in range(1,len(clocks)):
+                    temp_split = clocks[i][0].split(',')
+                    if temp_split[0] == 'l':
+                        print(temp_split[1] + ', ' + str(clocks[i][1]))
+                    elif temp_split[0] == 's':
+                        print("Send '" + temp_split[1] + "' to " + temp_split[2] + ", " + str(clocks[i][1]))
+                    else:
+                        print("Receive '" + temp_split[1] + "', " + str(clocks[i][1]))
 
 pid = sys.argv[1]
 port = int(sys.argv[2])
@@ -40,7 +48,8 @@ clocks = [('',0)]
 threading.Thread(target = process).start()
 threading.Thread(target = comm).start()
 while True:
-    e = input()
+    time.sleep(0.01)
+    e = input("Enter message: ")
     temp = e.split(',')
     events.put(e)
     
